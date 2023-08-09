@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <style>
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loading">
+
+        <div class="spinner"></div>
+    </div>
+    <table id="dataTable" class="display" style="display: none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>URL</th>
+                <th>File Size (Mb)</th>
+                <th>Stars</th>
+                <th>Commits</th>
+                <th>Ratio</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <style>
+        .spinner {
+            border: 4px solid rgba(5, 7, 99, 0.1);
+            border-top: 4px solid #09026d;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <script>
+        function numberWithCommas(x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+
+        $(document).ready(function () {
+            $.getJSON('top839.json', function (jsonData) {
+                $('#loading').hide();
+                $('#dataTable').show();
+                const dataTable = $('#dataTable').DataTable({
+                    autoWidth: false,
+                    // processing: true,
+
+                    data: jsonData,
+                    columns: [
+                        { data: 'id', "width": "8%" },
+                        { data: 'html_url', render: (data, type, row) => `<a href="${data}" target="_blank">${data}</a>`, "width": "30%" },
+                        { data: 'size', render: (data, type, row) => `${(data / 1000).toFixed(2)}`, "width": "8%" },
+
+                        { data: 'stargazers_count', "width": "8%", render: data => numberWithCommas(data) },
+                        { data: 'commits_count', "width": "8%" },
+                        { data: 'ratio', "width": "8%" }
+
+                    ], order: [[5, 'desc']]
+                    , pageLength: 25
+                });
+                // dataTable.columns.adjust()
+
+            });
+        });
+    </script>
+</body>
+
+</html>
